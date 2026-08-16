@@ -1,0 +1,15 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "key_ops": [
+        "verify"
+      ],
+      "n": "5S9JpgDTpdD-eiGlk7gvzARuP0UcCXzkyfsDydGDvFpczArZ5SJ21VU9bKSAUKGIqn5hOXSychX46dY-jxzfjugqa2_nqY4J3P8lDXIGKeMw13AJyXt2PDYCLlUX68udFkl3RWBWrIwQEVAa5VuDFnGZk_XBLwfzpM3VD57qoEzW0NWqdjGRRL2N5s1PRtC9KOCQnoyAynmHyfh0ZxqvExExVc6rI9IJXTqFSM0kN9uXV17nQrcK7NsUDhx3XaCOlNUgzhrm83Tnf9_wtolEtIZd3HIkGEOz5eieNROdX3sDWmJIR7RHjQVpWNYf-DkoE_v2EtJxMEPi1h6RCm0I0Q",
+      "e": "AQAB",
+      "kid": "lab-key-1",
+      "use": "sig",
+      "alg": "RS256"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "uid": { "type": "User", "id": "alice" },
+    "attrs": {
+      "department": "finance",
+      "employee_id": "E001",
+      "payment_limit": 500
+    },
+    "parents": []
+  },
+  {
+    "uid": { "type": "User", "id": "bob" },
+    "attrs": {
+      "department": "engineering",
+      "employee_id": "E002",
+      "payment_limit": 0
+    },
+    "parents": []
+  },
+  {
+    "uid": { "type": "Tool", "id": "list_invoices" },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": { "type": "Tool", "id": "get_employee" },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": { "type": "Tool", "id": "pay_invoice" },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": { "type": "Tool", "id": "send_email" },
+    "attrs": {},
+    "parents": []
+  }
+]

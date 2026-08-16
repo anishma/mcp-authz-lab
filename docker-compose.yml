@@ -1,0 +1,46 @@
+# The whole lab. Select the exercise with GATEWAY_CONFIG:
+#   GATEWAY_CONFIG=e1-ungoverned.yaml  docker compose up -d
+#   GATEWAY_CONFIG=e2-coarse.yaml      docker compose up -d gateway
+#   GATEWAY_CONFIG=e3-finegrained.yaml docker compose up -d gateway
+# Select the Cedar policy file (Exercise 3) with CEDAR_POLICIES:
+#   CEDAR_POLICIES=policies.starter.cedar   (default — students edit this)
+#   CEDAR_POLICIES=policies.solution.cedar  (instructor solution)
+
+services:
+  payflow:
+    build: ./server
+    ports:
+      - "8000:8000"   # exposed on purpose: Exercise 1 asks what happens if the agent skips the gateway
+
+  gateway:
+    image: ghcr.io/agentgateway/agentgateway:v1.4.1
+    command: ["-f", "/etc/lab/gateway/${GATEWAY_CONFIG:-e1-ungoverned.yaml}"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./gateway:/etc/lab/gateway:ro
+      - ./identity/jwks.json:/etc/lab/jwks.json:ro
+    depends_on:
+      - payflow
+
+  # The PDP: exposes the open OpenID AuthZEN evaluation API and evaluates Cedar
+  # policy in-process (the official Cedar engine via cedarpy). It reads the
+  # chosen policy file + entities on every request, so editing a policy takes
+  # effect on the next tool call with no restart.
+  authzen-pdp:
+    build: ./authzen_pdp
+    environment:
+      POLICY_FILE: /policies/${CEDAR_POLICIES:-policies.starter.cedar}
+      ENTITIES_FILE: /policies/entities.json
+    volumes:
+      - ./pdp:/policies:ro
+    ports:
+      - "8181:8080"   # exposed so students can POST /access/v1/evaluation directly (host:container)
+
+  # PEP-side adapter: gateway ExtMcp hook -> AuthZEN evaluation request.
+  gateway-bridge:
+    build: ./adapter
+    environment:
+      PDP_URL: http://authzen-pdp:8080
+    depends_on:
+      - authzen-pdp

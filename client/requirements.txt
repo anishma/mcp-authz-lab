@@ -1,0 +1,6 @@
+# Host-side dependencies (agent, validation harness, and — optionally —
+# regenerating the identity fixtures). Requires Python 3.10+.
+mcp>=1.9,<2
+# Only needed if you regenerate identity/tokens via identity/make_tokens.py:
+PyJWT>=2.8
+cryptography>=42

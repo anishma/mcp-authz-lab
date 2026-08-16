@@ -1,0 +1,29 @@
+# Exercise 2: coarse, tool-name authorization.
+# CEL rules see the tool NAME and the caller's JWT claims — but not the
+# call's ARGUMENTS. Find the attack that survives these rules.
+binds:
+- port: 3000
+  listeners:
+  - routes:
+    - policies:
+        jwtAuth:
+          issuer: https://lab-issuer.payflow.example
+          audiences: [payflow-mcp]
+          jwks:
+            file: /etc/lab/jwks.json
+        mcpAuthorization:
+          rules:
+          # Anyone may read the invoice queue.
+          - 'mcp.tool.name == "list_invoices"'
+          # Only finance staff may move money.
+          - 'mcp.tool.name == "pay_invoice" && jwt.department == "finance"'
+          # HR records: finance (payroll) and HR only.
+          - 'mcp.tool.name == "get_employee" && (jwt.department == "finance" || jwt.department == "hr")'
+          # Everyone may send email.
+          - 'mcp.tool.name == "send_email"'
+      backends:
+      - mcp:
+          targets:
+          - name: payflow
+            mcp:
+              host: http://payflow:8000/mcp

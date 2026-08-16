@@ -1,0 +1,19 @@
+# Exercise 1: authenticated but UNGOVERNED.
+# The gateway verifies who the delegating user is (JWT), then lets the agent
+# invoke anything. Authentication is not authorization.
+binds:
+- port: 3000
+  listeners:
+  - routes:
+    - policies:
+        jwtAuth:
+          issuer: https://lab-issuer.payflow.example
+          audiences: [payflow-mcp]
+          jwks:
+            file: /etc/lab/jwks.json
+      backends:
+      - mcp:
+          targets:
+          - name: payflow
+            mcp:
+              host: http://payflow:8000/mcp

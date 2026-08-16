@@ -1,0 +1,37 @@
+# Exercise 3: fine-grained authorization via an external AuthZEN PDP.
+# The coarse rules from Exercise 2 stay on as an outer layer; in addition,
+# every tools/call is sent (with its full arguments) to the gateway-bridge,
+# which issues an OpenID AuthZEN evaluation request to the PDP (backed by the
+# Cedar policy engine) for a per-invocation decision.
+binds:
+- port: 3000
+  listeners:
+  - routes:
+    - policies:
+        jwtAuth:
+          issuer: https://lab-issuer.payflow.example
+          audiences: [payflow-mcp]
+          jwks:
+            file: /etc/lab/jwks.json
+        mcpAuthorization:
+          rules:
+          - 'mcp.tool.name == "list_invoices"'
+          - 'mcp.tool.name == "pay_invoice" && jwt.department == "finance"'
+          - 'mcp.tool.name == "get_employee" && (jwt.department == "finance" || jwt.department == "hr")'
+          - 'mcp.tool.name == "send_email"'
+        mcpGuardrails:
+          processors:
+          - kind: remote
+            methods: { "tools/call": request }
+            host: gateway-bridge:50051
+            failureMode: failClosed
+            metadata:
+              # The gateway verified the JWT; forward the authenticated
+              # subject to the PDP as the Cedar principal.
+              sub: 'jwt.sub'
+      backends:
+      - mcp:
+          targets:
+          - name: payflow
+            mcp:
+              host: http://payflow:8000/mcp
